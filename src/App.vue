@@ -1,7 +1,6 @@
 <template>
-  <div class="box">
-    <h1>我是梵忆</h1>
-    <h2>测试axios二次封装</h2>
+  <div class="">
+    <router-view></router-view>
   </div>
 </template>
 
