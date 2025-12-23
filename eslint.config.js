@@ -1,3 +1,4 @@
+/* eslint-env node */
 // eslint.config.js
 import js from '@eslint/js'
 import globals from 'globals'
@@ -8,6 +9,23 @@ import prettier from 'eslint-plugin-prettier'
 import { defineConfig } from 'eslint/config'
 
 export default defineConfig([
+  // ========================
+  // ESLint 配置文件自身（Node 环境）
+  // ========================
+  {
+    files: [
+      'eslint.config.js',
+      'commitlint.config.cjs',
+      '*.config.js',
+      '*.config.cjs',
+      'scripts/**/*.js',
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   // ========================
   // 忽略文件
   // ========================
