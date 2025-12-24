@@ -6,11 +6,4 @@
 
 <script setup lang="ts"></script>
 
-<style scoped lang="scss">
-.box {
-  h1 {
-    background-color: #6e3434;
-    color: $base-color;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
