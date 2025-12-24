@@ -71,8 +71,12 @@ let loginForm = reactive({
 // 登录按钮点击事件
 const login = async () => {
   try {
-    // 全部表单项校验通过后才执行登录操作
-    await loginForms.value.validate()
+    try {
+      await loginForms.value.validate()
+    } catch {
+      // ❗只拦截“表单校验失败”
+      return
+    }
     loading.value = true // 开启加载效果
     await userStore.userLogin(loginForm)
     // 登录成功后跳转到首页
