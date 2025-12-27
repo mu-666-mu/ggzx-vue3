@@ -1,7 +1,7 @@
 <template>
   <div class="login_container">
     <el-row>
-      <el-col :span="12" :xs="0">占位的格子</el-col>
+      <el-col :span="12" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
         <!-- 登录表单 -->
         <el-form
