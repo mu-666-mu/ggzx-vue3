@@ -1,5 +1,6 @@
 // 二次封装封装axios请求模块
 // 引入axios和element-plus消息提示组件
+import useUserStore from '@/store/modules/user'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
@@ -12,6 +13,10 @@ const request = axios.create({
 })
 //请求拦截器
 request.interceptors.request.use((config) => {
+  const UserStore = useUserStore()
+  if (UserStore.token) {
+    config.headers.token = UserStore.token
+  }
   return config
 })
 //响应拦截器
