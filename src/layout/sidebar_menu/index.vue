@@ -27,7 +27,6 @@
     <el-sub-menu
       :index="item.path"
       v-if="item.children && item.children.length > 1"
-      @click="goRouter"
     >
       <template #title>
         <el-icon>
