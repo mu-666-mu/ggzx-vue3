@@ -50,7 +50,7 @@ import { reactive, ref } from 'vue'
 // 引入用户相关的store
 import useUserStore from '@/store/modules/user'
 // 引入路由实例
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 // 引入ele-plus消息通知组件
 import { ElNotification } from 'element-plus'
 //引入获取当前小时的方法
@@ -59,6 +59,7 @@ import { getTimeHour } from '@/utils/time'
 const userStore = useUserStore()
 // 获取路由实例
 const $router = useRouter()
+const $route = useRoute()
 // 获得el-form组件
 const loginForms = ref()
 // 定义变量控制按钮的加载效果
@@ -80,7 +81,9 @@ const login = async () => {
     loading.value = true // 开启加载效果
     await userStore.userLogin(loginForm)
     // 登录成功后跳转到首页
-    $router.push('/')
+    // 路径有query参数时候跳往对应路径
+    const redirect: any = $route.query.redirect
+    $router.push({ path: redirect || '/' })
     // 提示登录成功
     ElNotification({
       type: 'success',

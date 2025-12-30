@@ -8,7 +8,7 @@ import type { UserState } from '@/store/modules/types/type'
 // 引入路由(常量路由)
 import { constantRoute } from '@/router/routes'
 // 引入本地存储的方法
-import { setToken, getToken } from '@/utils/token'
+import { setToken, getToken, REMOVE_TOKEN } from '@/utils/token'
 
 // 创建用户仓库
 const useUserStore = defineStore('User', {
@@ -44,7 +44,17 @@ const useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.userName = result.data.checkUser.username
         this.avatar = result.data.checkUser.avatar
+        return 'ok'
+      } else {
+        return Promise.reject('获取用户信息失败')
       }
+    },
+    // 退出登录
+    userLogout() {
+      this.token = ''
+      this.userName = ''
+      this.avatar = ''
+      REMOVE_TOKEN()
     },
   },
 })
