@@ -1,9 +1,12 @@
 // 用户相关仓库
 import { defineStore } from 'pinia'
 //引入接口
-import { reqLogin, reqUserInfo } from '@/api/user'
-// 引入类型
-import type { loginForm, loginResponseData } from '@/api/user/type'
+import { reqLogin, reqUserInfo, reqLogout } from '@/api/user'
+import type {
+  loginFormData,
+  loginResponseData,
+  userInfoResponseData,
+} from '@/api/user/type'
 import type { UserState } from '@/store/modules/types/type'
 // 引入路由(常量路由)
 import { constantRoute } from '@/router/routes'
@@ -26,35 +29,45 @@ const useUserStore = defineStore('User', {
   // 处理异步操作和逻辑
   actions: {
     // 用户登录方法
-    async userLogin(data: loginForm) {
+    async userLogin(data: loginFormData) {
       const result: loginResponseData = await reqLogin(data)
+      console.log(result)
+
       // 登录成功200
       if (result.code === 200) {
-        this.token = result.data.token as string
+        this.token = result.data as string
         // 本地持久化存储token
-        setToken(result.data.token as string)
+        setToken(result.data as string)
         return 'ok'
       } else {
-        return Promise.reject(new Error(result.data.message))
+        return Promise.reject(new Error(result.message))
       }
     },
     // 获取用户信息
     async userInfo() {
-      const result = await reqUserInfo()
+      const result: userInfoResponseData = await reqUserInfo()
+      console.log(result)
+
       if (result.code == 200) {
-        this.userName = result.data.checkUser.username
-        this.avatar = result.data.checkUser.avatar
+        this.userName = result.data.name
+        this.avatar = result.data.avatar
         return 'ok'
       } else {
         return Promise.reject('获取用户信息失败')
       }
     },
     // 退出登录
-    userLogout() {
-      this.token = ''
-      this.userName = ''
-      this.avatar = ''
-      REMOVE_TOKEN()
+    async userLogout() {
+      const result: any = await reqLogout()
+      if (result.code == 200) {
+        this.token = ''
+        this.userName = ''
+        this.avatar = ''
+        REMOVE_TOKEN()
+        return 'ok'
+      } else {
+        return Promise.reject(new Error(result.message))
+      }
     },
   },
 })
