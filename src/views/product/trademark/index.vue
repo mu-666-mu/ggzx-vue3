@@ -40,7 +40,20 @@
               icon="Edit"
               @click="updateTrademark(row)"
             ></el-button>
-            <el-button type="primary" size="small" icon="Delete"></el-button>
+            <el-popconfirm
+              :title="`确定删除${row.tmName}?`"
+              width="200px"
+              icon="delete"
+              @confirm="deleteTrademark(row.id)"
+            >
+              <template #reference>
+                <el-button
+                  type="primary"
+                  size="small"
+                  icon="Delete"
+                ></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -124,6 +137,7 @@ import { onMounted, reactive, ref } from 'vue'
 import {
   reqHasTrademark,
   reqAddOrUpdateTrademark,
+  reqDeleteTrademark,
 } from '@/api/product/trademark'
 import type {
   Records,
@@ -197,6 +211,27 @@ const updateTrademark = (row: TradeMark) => {
   //ES6语法
   Object.assign(trademarkParams, row)
 }
+// 删除按钮-气泡确认框确认回调
+const deleteTrademark = async (id: number) => {
+  //
+  const result = await reqDeleteTrademark(id)
+  if (result.code == 200) {
+    //提示删除成功
+    ElMessage({
+      type: 'success',
+      message: '删除成功',
+    })
+    //重新请求数据
+    getHasTrademark(
+      trademarkArr.value.length > 1 ? pageNo.value : pageNo.value - 1,
+    )
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败',
+    })
+  }
+}
 // 表单取消
 const cancel = () => {
   //关闭对话框
@@ -231,7 +266,7 @@ const confirm = async () => {
   }
   //
 }
-// 图片上传之前钩子函数beforeAvatarUpload
+// 图片上传之前钩子函数 限制文件规格
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   //上传成功前触发
   //console.log(rawFile)
