@@ -71,18 +71,31 @@
       <el-form style="width: 80%">
         <!-- 品牌名称 -->
         <el-form-item label="品牌名称" label-width="80px">
-          <el-input placeholder="请输入品牌名称"></el-input>
+          <el-input
+            placeholder="请输入品牌名称"
+            v-model="trademarkParams.tmName"
+          ></el-input>
         </el-form-item>
         <!-- 品牌LOGO -->
         <el-form-item label="品牌LOGO" label-width="80px">
+          <!-- upload组件：
+          action 图片上传路径书写/api，代理服务器不发送这次post请求
+          before-upload 上传文件之前的钩子，可用于限制上传文件格式、大小
+          on-success 上传成功钩子
+          -->
           <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            action="/api/admin/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
+            :headers="{ token: userStore.token }"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <img
+              v-if="trademarkParams.logoUrl"
+              :src="trademarkParams.logoUrl"
+              class="avatar"
+            />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -97,12 +110,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { reqHasTrademark } from '@/api/product/trademark'
+import { onMounted, reactive, ref } from 'vue'
+import {
+  reqHasTrademark,
+  reqAddOrUpdateTrademark,
+} from '@/api/product/trademark'
 import type {
   Records,
+  TradeMark,
   TradeMarkResponseData,
 } from '@/api/product/trademark/type'
+//
+import type { UploadProps } from 'element-plus'
+import { ElMessage } from 'element-plus'
+//
+import useUserStore from '@/store/modules/user'
+import { f } from 'vue-router/dist/router-CWoNjPRp.mjs'
+const userStore = useUserStore()
 // 当前页码
 const pageNo = ref<number>(1)
 // 每页展示数据数量
@@ -113,6 +137,11 @@ const total = ref<number>(0)
 const trademarkArr = ref<Records>([])
 //控制对话框显示与隐藏
 const dialogTableVisible = ref<boolean>(false)
+// 收集新增品牌数据
+const trademarkParams = reactive<TradeMark>({
+  tmName: '',
+  logoUrl: '',
+})
 //获取已有品牌的接口封装为函数
 const getHasTrademark = async () => {
   const result: TradeMarkResponseData = await reqHasTrademark(
@@ -140,6 +169,9 @@ const sizeChange = () => {
 //添加品牌按钮回调
 const addTrademark = () => {
   dialogTableVisible.value = true
+  //清空收集到的数据
+  trademarkParams.logoUrl = ''
+  trademarkParams.tmName = ''
 }
 // 修改品牌回调
 const updateTrademark = () => {
@@ -147,11 +179,70 @@ const updateTrademark = () => {
 }
 // 表单取消
 const cancel = () => {
-  //
+  //关闭对话框
+  dialogTableVisible.value = false
 }
 // 表单确定
-const confirm = () => {
+const confirm = async () => {
+  const result = await reqAddOrUpdateTrademark(trademarkParams)
+  if (result.code == 200) {
+    //添加成功
+    //关闭对话框
+    dialogTableVisible.value = false
+    //弹出提示信息
+    ElMessage({
+      type: 'success',
+      message: '添加品牌成功',
+    })
+    //发请求，重新获取全部品牌数据
+    getHasTrademark()
+  } else {
+    //添加失败
+    //弹出提示信息
+    ElMessage({
+      type: 'error',
+      message: '添加品牌失败',
+    })
+    //关闭对话框
+    dialogTableVisible.value = false
+  }
   //
+}
+// 图片上传之前钩子函数beforeAvatarUpload
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  //上传成功前触发
+  //console.log(rawFile)
+
+  //要求格式png|jpg|gif <4M
+  if (
+    rawFile.type == 'image/png' ||
+    rawFile.type == 'image/jpg' ||
+    rawFile.type == 'image/jpeg' ||
+    rawFile.type == 'image/gif'
+  ) {
+    //要求符合大小
+    if (rawFile.size / 1024 / 1024 < 10) {
+      return true
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '文件大小应小于10M',
+      })
+      return false
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '文件上传格式应为PNG|JPG|GIF',
+    })
+    return false
+  }
+}
+// 图片上传成功钩子
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
+  //response 当次上传图片post请求服务器返回的数据
+  //uploadFile
+  trademarkParams.logoUrl = response.data
 }
 </script>
 
