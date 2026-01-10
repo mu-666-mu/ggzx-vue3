@@ -2,8 +2,8 @@
 import type { App } from 'vue'
 
 import SvgIcon from './SvgIcon'
-
-const components = [SvgIcon]
+import Category from './Category/index'
+const components = [SvgIcon, Category]
 
 export default {
   install(app: App) {
