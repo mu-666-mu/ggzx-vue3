@@ -1,4 +1,4 @@
-// 封装SvgIcon组件
+// 封装分类组件
 
 import Category from '@/components/Category/index.vue'
 import type { App } from 'vue'
