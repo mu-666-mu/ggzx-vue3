@@ -9,6 +9,7 @@
             v-model="categoryStore.c1Id"
             style="width: 180px"
             @change="handler1"
+            :disabled="cardChange == 1 ? true : false"
           >
             <!-- value 下拉菜单收集的数据 -->
             <el-option
@@ -26,6 +27,7 @@
             v-model="categoryStore.c2Id"
             style="width: 180px"
             @change="handler2"
+            :disabled="cardChange == 1 ? true : false"
           >
             <el-option
               v-for="c2 in categoryStore.c2Arr"
@@ -41,6 +43,7 @@
             placeholder="请选择"
             v-model="categoryStore.c3Id"
             style="width: 180px"
+            :disabled="cardChange == 1 ? true : false"
           >
             <el-option
               v-for="c3 in categoryStore.c3Arr"
@@ -56,14 +59,23 @@
 </template>
 
 <script setup lang="ts">
+//--------------------------------------------------------------
 //引入生命周期钩子
 import { onMounted } from 'vue'
 //引入分类相关仓库
 import useCategoryStore from '@/store/modules/category'
+//--------------------------------------------------------------
+//接收父组件传递的卡片切换变量
+defineProps(['cardChange'])
+//--------------------------------------------------------------
+//分类相关仓库实例化
 const categoryStore = useCategoryStore()
+//--------------------------------------------------------------
+//挂载时
 onMounted(() => {
   getC1()
 })
+//--------------------------------------------------------------
 //通知仓库获取一级分类的方法
 const getC1 = () => {
   categoryStore.getC1()
